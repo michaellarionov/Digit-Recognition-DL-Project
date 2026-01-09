@@ -19,7 +19,7 @@ loaders = {
     'train': DataLoader(trainingData, batch_size=100, shuffle=True, num_workers=1),
     'test': DataLoader(testData, batch_size=100, shuffle=True, num_workers=1),
 }
-
+# Define the CNN architecture
 class CNN(nn.module):
     def __init__(self):
         super(CNN,self).__init__()
