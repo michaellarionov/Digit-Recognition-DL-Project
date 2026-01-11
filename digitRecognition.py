@@ -4,6 +4,7 @@ from torch.utils import DataLoader
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import torch
 
 transform = transforms.Compose([
     transforms.Pad(2),      # 28×28 → 32×32
@@ -46,3 +47,22 @@ class LeNet5(nn.Module):
         x = self.fc2(x)
 
         return F.log_softmax(x, dim=1)
+
+device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model=LeNet5().to(device)
+optimizer=optim.Adam(model.parameters(), lr=0.001)
+lossFunction=nn.CrossEntropyLoss()
+
+def train(epoch):
+    model.train()
+    for batch_index, (data, target) in enumerate(loaders['train']):
+        data, target = data.to(device), target.to(device)
+
+        optimizer.zero_grad()
+        outputs = model(data)
+        loss = lossFunction(outputs, target)
+        loss.backward()
+        optimizer.step()
+        if batch_index % 20 == 0:
+            print(f"Train Epoch: {epoch} [{batch_index * len(data)}/{len(loaders['train'].dataset)}"
+                  f" ({100. * batch_index / len(loaders['train']):.0f}%)]\tLoss: {loss.item():.6f}")
