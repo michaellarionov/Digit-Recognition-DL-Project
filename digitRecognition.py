@@ -1,6 +1,7 @@
 from torchvision import datasets
+from torchvision import transforms
 from torchvision.transforms import ToTensor
-from torch.utils import DataLoader
+from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -66,3 +67,22 @@ def train(epoch):
         if batch_index % 20 == 0:
             print(f"Train Epoch: {epoch} [{batch_index * len(data)}/{len(loaders['train'].dataset)}"
                   f" ({100. * batch_index / len(loaders['train']):.0f}%)]\tLoss: {loss.item():.6f}")
+def test():
+    model.eval()
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in loaders['test']:
+            data, target = data.to(device), target.to(device)
+            outputs = model(data)
+            test_loss += lossFunction(outputs, target).item()
+            pred = outputs.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+    test_loss /= len(loaders['test'].dataset)
+    print(f"Test set: Average loss: {test_loss:.4f}, Accuracy: {correct}/{len(loaders['test'].dataset)} "
+          f"({100. * correct / len(loaders['test'].dataset):.0f}%)")
+
+for epoch in range(1, 11):
+    train(epoch)
+    test()
