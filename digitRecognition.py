@@ -7,6 +7,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch
 
+epochs = 10
+
 transform = transforms.Compose([
     transforms.Pad(2),      # 28×28 → 32×32
     transforms.ToTensor()
@@ -23,8 +25,8 @@ testData=datasets.MNIST(root="data"
                             , transform=ToTensor())
 
 loaders = {
-    'train': DataLoader(trainingData, batch_size=100, shuffle=True, num_workers=1),
-    'test': DataLoader(testData, batch_size=100, shuffle=True, num_workers=1),
+    'train': DataLoader(trainingData, batch_size=100, shuffle=True, num_workers=0),
+    'test': DataLoader(testData, batch_size=100, shuffle=True, num_workers=0),
 }
 # Define the CNN architecture
 class LeNet5(nn.Module):
@@ -33,9 +35,9 @@ class LeNet5(nn.Module):
 
         self.conv1 = nn.Conv2d(1, 6, kernel_size=5)      
         self.conv2 = nn.Conv2d(6, 16, kernel_size=5)     
-        self.conv3 = nn.Conv2d(16, 120, kernel_size=5)   
+        self.conv3 = nn.Conv2d(16, 120, kernel_size=5, padding=2)   
 
-        self.fc1 = nn.Linear(120, 84)                    
+        self.fc1 = nn.Linear(1920, 84)                    
         self.fc2 = nn.Linear(84, 10)                     
 
     def forward(self, x):
@@ -43,7 +45,7 @@ class LeNet5(nn.Module):
         x = F.avg_pool2d(torch.tanh(self.conv2(x)), 2)
         x = torch.tanh(self.conv3(x))
 
-        x = x.view(x.size(0), -1)
+        x = torch.flatten(x,1)
         x = torch.tanh(self.fc1(x))
         x = self.fc2(x)
 
@@ -83,6 +85,12 @@ def test():
     print(f"Test set: Average loss: {test_loss:.4f}, Accuracy: {correct}/{len(loaders['test'].dataset)} "
           f"({100. * correct / len(loaders['test'].dataset):.0f}%)")
 
-for epoch in range(1, 11):
-    train(epoch)
-    test()
+def main():
+    for epoch in range(1, epochs + 1):
+        train(epoch)
+        test()
+    import os
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    torch.save(model.state_dict(), os.path.join(script_dir, "mnist_cnn_weights.pth"))
+if __name__ == "__main__":
+    main()
