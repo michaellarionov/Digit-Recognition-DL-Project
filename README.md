@@ -31,7 +31,6 @@ Make sure you have **Python 3.8+** installed. Then install the required packages
 
 ```bash
 pip install torch torchvision numpy fastapi uvicorn
-
 ## Usage
 
 def train(epoch):
@@ -47,7 +46,6 @@ def train(epoch):
         if batch_index % 20 == 0:
             print(f"Train Epoch: {epoch} [{batch_index * len(data)}/{len(loaders['train'].dataset)}"
                   f" ({100. * batch_index / len(loaders['train']):.0f}%)]\tLoss: {loss.item():.6f}")
-
 ## Project Structure
 
 Digit-Recognition-NN/
@@ -58,6 +56,9 @@ Digit-Recognition-NN/
 ├─ main.py              # FastAPI backend
 ├─ train.py             # Training script
 └─ README.md
+## License
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
 
 
 
